@@ -7,7 +7,11 @@ from PIL import Image, ImageTk
 import threading
 import numpy as np
 from ui.button import create_rounded_button
+from utils.logs import log_blink_count 
+from db.connect import initialize_database 
 
+
+initialize_database()
 
 class EyeBlinkApp:
     def __init__(self, root):
@@ -47,11 +51,20 @@ class EyeBlinkApp:
 
         self.exit_button = ttk.Button(self.buttons_frame, text="Exit", command=self.exit_app)
         self.exit_button.grid(row=0, column=2, padx=10)
+        
+        self.log_blinks_periodically()
 
         # OpenCV video capture
         self.cap = cv2.VideoCapture(0)
         self.update_frame()
         
+        
+    def log_blinks_periodically(self):
+        # Log the blink count to the database
+        log_blink_count(self.TOTAL_BLINKS)
+        
+        # Schedule this function to run again after a certain interval (e.g., 5 minutes)
+        self.root.after(10000, self.log_blinks_periodically) 
         
     def toggle_recording(self):
         if not hasattr(self, "recording"):  # Ensure self.recording is initialized
