@@ -5,12 +5,13 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 import threading
+import numpy as np
 
 
 class CameraApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Tkinter OpenCV & Eye Blink Integration")
+        self.root.title("Eye Blink Detector")
         self.root.geometry("800x600")
         self.recording = False
         self.face_mesh = mediapipe.solutions.face_mesh.FaceMesh(
@@ -44,6 +45,7 @@ class CameraApp:
 
         # OpenCV video capture
         self.cap = cv2.VideoCapture(0)
+        self.update_frame()
 
     def landmarks_detection(self, image, results):
         """Detect landmarks on the face."""
@@ -71,10 +73,14 @@ class CameraApp:
             ret, frame = self.cap.read()
             if ret:
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                
                 results = self.face_mesh.process(rgb_frame)
 
                 if results.multi_face_landmarks:
                     landmarks = self.landmarks_detection(frame, results)
+                    
+                    for landmark in landmarks:
+                        cv2.circle(frame, landmark, 1, (0, 255, 0), -1) 
 
                     # Calculate blink ratio
                     eyes_ratio = self.blink_ratio(landmarks, self.RIGHT_EYE, self.LEFT_EYE)
@@ -93,6 +99,7 @@ class CameraApp:
 
                 # Convert to Tkinter-compatible format
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                
                 frame = cv2.resize(frame, (640, 480))
                 img = ImageTk.PhotoImage(Image.fromarray(frame))
                 self.video_frame.config(image=img)
@@ -112,6 +119,10 @@ class CameraApp:
     def stop_recording(self):
         """Stop video recording."""
         self.recording = False
+        blank_frame = np.full((480, 640, 3), 255, dtype=np.uint8)
+        img = ImageTk.PhotoImage(Image.fromarray(blank_frame))
+        self.video_frame.config(image=img)
+        self.video_frame.image = img
 
     def exit_app(self):
         """Exit the application."""
