@@ -4,7 +4,6 @@ from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 import pyautogui
 import numpy as np
-import eyeblink
 
 class CameraApp:
     def __init__(self, root):
@@ -57,8 +56,7 @@ class CameraApp:
         if not self.cap.isOpened():
             messagebox.showerror("Error", "Camera not accessible!")
             return
-        # self.recording = True
-        eyeblink.start_liveness_detection
+        self.recording = True
         self.update_frame()
 
     def stop_recording(self):

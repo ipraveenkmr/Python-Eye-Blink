@@ -104,4 +104,4 @@ def start_liveness_detection():
 
 
 # Run the liveness detection function
-start_liveness_detection()
+# start_liveness_detection()
