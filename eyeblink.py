@@ -6,7 +6,7 @@ from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 import threading
 import numpy as np
-from ui import create_rounded_button
+from ui.button import create_rounded_button
 
 
 class EyeBlinkApp:
