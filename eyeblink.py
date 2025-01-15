@@ -9,6 +9,7 @@ import numpy as np
 from ui.button import create_rounded_button
 from utils.logs import log_blink_count 
 from db.connect import initialize_database 
+import psutil
 
 
 initialize_database()
@@ -17,7 +18,7 @@ class EyeBlinkApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Eye Blink Detector")
-        self.root.geometry("800x600")
+        self.root.geometry("900x700")
         self.recording = False
         self.face_mesh = mediapipe.solutions.face_mesh.FaceMesh(
             max_num_faces=1, min_detection_confidence=0.6, min_tracking_confidence=0.7
@@ -32,6 +33,10 @@ class EyeBlinkApp:
         # UI Components
         self.title_label = tk.Label(root, text="OpenCV Eye Blink Detection", font=("Helvetica", 16))
         self.title_label.pack(pady=10)
+        
+        # Performance metrics label
+        self.performance_label = tk.Label(root, text="CPU: 0% | Memory: 0%", font=("Helvetica", 12))
+        self.performance_label.pack(pady=10)
 
         self.video_frame = tk.Label(root)
         self.video_frame.pack()
@@ -57,7 +62,21 @@ class EyeBlinkApp:
         # OpenCV video capture
         self.cap = cv2.VideoCapture(0)
         self.update_frame()
+        self.update_performance_metrics()
         
+       
+    def update_performance_metrics(self):
+        """Update CPU and memory usage once per second."""
+        cpu_usage = psutil.cpu_percent()
+        memory_info = psutil.virtual_memory()
+        memory_usage = memory_info.percent
+
+        self.performance_label.config(
+            text=f"CPU: {cpu_usage}% | Memory: {memory_usage}%"
+        )
+
+        # Schedule the next update after 1 second
+        self.root.after(1000, self.update_performance_metrics)
         
     def log_blinks_periodically(self):
         # Log the blink count to the database

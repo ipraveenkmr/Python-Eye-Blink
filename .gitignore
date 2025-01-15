@@ -55,6 +55,7 @@ dmypy.json
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+.exe
 
 # Visual Studio Code
 .vscode/
